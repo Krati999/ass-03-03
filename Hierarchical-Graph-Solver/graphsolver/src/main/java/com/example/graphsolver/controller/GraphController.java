@@ -17,8 +17,12 @@ public class GraphController {
 
     // Endpoint to add a node
     @PostMapping("/nodes")
-    public String addNode(@RequestBody Node node) {
-        graphService.addNode(node);
+    public String addNode(@RequestBody List<Node> node) {
+
+            for(Node n : node)
+            {
+                graphService.addNode(n);
+            }
         return "Node added successfully!";
     }
 
@@ -30,8 +34,10 @@ public class GraphController {
 
     // Endpoint to add a relationship between nodes
     @PostMapping("/relationships")
-    public String addRelationship(@RequestBody Relationship relationship) {
-        graphService.addRelationship(relationship);
+    public String addRelationship(@RequestBody List<Relationship> relationship) {
+        for(Relationship r: relationship){
+        graphService.addRelationship(r);
+        }
         return "Relationship added successfully!";
     }
 

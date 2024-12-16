@@ -43,46 +43,73 @@ public class GraphService {
 
     // Find a path between two nodes (DFS or BFS could be implemented here)
     public List<String> findPath(String startNodeId, String endNodeId) {
-        // Placeholder implementation (this could be a DFS or BFS)
+        return findPathDFS(startNodeId, endNodeId);
+    }
+
+    public List<String> findPathDFS(String startNodeId, String endNodeId) {
+        Set<String> visited = new HashSet<>();
         List<String> path = new ArrayList<>();
-        path.add(startNodeId);
-        path.add(endNodeId);
-        return path;
-    }
-
-    // Calculate the depth of a node (distance from the root)
-    public int calculateDepth(String nodeId) {
-        Node node = nodes.get(nodeId);
-        int depth = 0;
-
-        while (node != null && node.getParentId() != null) {
-            node = nodes.get(node.getParentId());
-            depth++;
+        if (dfs(startNodeId, endNodeId, visited, path)) {
+            return path;
         }
-
-        return depth;
+        return new ArrayList<>(); // No path found
     }
-
-    // Find the common ancestor between two nodes
-    public String findCommonAncestor(String nodeId1, String nodeId2) {
-        Set<String> ancestors1 = new HashSet<>();
-        Node node1 = nodes.get(nodeId1);
-        Node node2 = nodes.get(nodeId2);
-
-        // Collect ancestors of node1
-        while (node1 != null && node1.getParentId() != null) {
-            ancestors1.add(node1.getId());
-            node1 = nodes.get(node1.getParentId());
-        }
-
-        // Find the first common ancestor
-        while (node2 != null) {
-            if (ancestors1.contains(node2.getId())) {
-                return node2.getId();
+        private boolean dfs (String currentNodeId, String endNodeId, Set < String > visited, List < String > path)
+        {
+            visited.add(currentNodeId);
+            path.add(currentNodeId);
+            // If we've reached the target node, return true
+            if (currentNodeId.equals(endNodeId)) {
+                return true;
             }
-            node2 = nodes.get(node2.getParentId());
+            // Get the node and its children
+            Node currentNode = nodes.get(currentNodeId);
+            if (currentNode != null && currentNode.getChildren() != null) {
+                for (Node childNode : currentNode.getChildren()) {
+                    if (!visited.contains(childNode.getId())) {
+                        if (dfs(childNode.getId(), endNodeId, visited, path)) {
+                            return true;
+                        }
+                    }
+                }
+            }    // Backtrack if no path found
+            path.remove(path.size() - 1);
+            return false;
         }
 
-        return null; // No common ancestor found
+        // Calculate the depth of a node (distance from the root)
+        public int calculateDepth (String nodeId){
+            Node node = nodes.get(nodeId);
+            int depth = 0;
+
+            while (node != null && node.getParentId() != null) {
+                node = nodes.get(node.getParentId());
+                depth++;
+            }
+
+            return depth;
+        }
+
+        // Find the common ancestor between two nodes
+        public String findCommonAncestor (String nodeId1, String nodeId2){
+            Set<String> ancestors1 = new HashSet<>();
+            Node node1 = nodes.get(nodeId1);
+            Node node2 = nodes.get(nodeId2);
+
+            // Collect ancestors of node1
+            while (node1 != null && node1.getParentId() != null) {
+                ancestors1.add(node1.getId());
+                node1 = nodes.get(node1.getParentId());
+            }
+
+            // Find the first common ancestor
+            while (node2 != null) {
+                if (ancestors1.contains(node2.getId())) {
+                    return node2.getId();
+                }
+                node2 = nodes.get(node2.getParentId());
+            }
+
+            return null; // No common ancestor found
+        }
     }
-}
